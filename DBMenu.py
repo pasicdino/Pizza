@@ -4,7 +4,7 @@ import null as null
 import Transform
 
 
-class DBConnector:
+class DBMenu:
     db = null
     mycursor = null
 
@@ -17,7 +17,7 @@ class DBConnector:
         return Transform.listOfTuplesToList(self.mycursor.fetchall())
 
     def getPizza(self, pizzaID):
-        self.mycursor.execute('SELECT pizza_name FROM pizzas WHERE pizza_id LIKE +' + str(pizzaID) + ';')
+        self.mycursor.execute('SELECT pizza_name FROM pizzas WHERE pizza_id LIKE ' + str(pizzaID) + ';')
 
         return self.mycursor.fetchall()[0][0]
 
