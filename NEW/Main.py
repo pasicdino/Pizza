@@ -60,8 +60,8 @@ class Discount_codes(Base):
     __tablename__ = 'discount_codes'
 
     discount_id = Column(Integer(), primary_key=True, autoincrement=True, nullable=False)
-    discount_code = (String(50), nullable=False, unique=True)
-    customer_id = (Integer(), ForeignKey('customers.customer_id'), nullable=False)
+    discount_code = Column(String(50), nullable=False, unique=True)
+    customer_id = Column(Integer(), ForeignKey('customers.customer_id'), nullable=False)
 
 class Pizza_orders(Base):
     __tablename__ = 'pizza_orders'
@@ -71,7 +71,38 @@ class Pizza_orders(Base):
     size = Column(Integer(), nullable=False)
     amount = Column(Integer(), nullable=False)
 
+class Customer(Base):
+    __tablename__ = 'customers'
+    customer_id = Column(Integer(), primary_key=True, autoincrement=True, nullable=False)
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
+    email = Column(String(255), nullable=False, unique=True)
+    phone_number = Column(String(50), nullable=False)
+    street_name = Column(String(255), nullable=False)
+    street_number = Column(String(50), nullable=False)
+    city = Column(String(50), nullable=False)
 
+class Delivery_person(Base):
+    __tablename__ = 'delivery_persons'
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
+    email = Column(String(255), nullable=False, unique=True)
+    phone_number = Column(String(50), nullable=False)
+    street_name = Column(String(255), nullable=False)
+    street_number = Column(String(50), nullable=False)
+    city = Column(String(50), nullable=False)
+
+class Dessert_order(Base):
+    __tablename__ = 'dessert_orders'
+    order_id = Column(Integer(), ForeignKey('orders.order_id'), nullable=False)
+    dessert_id = Column(Integer(), ForeignKey('desserts.dessert_id'), nullable=False)
+    amount = Column(Integer(), nullable=False)
+
+class Drink_order(Base):
+    __tablename__ = 'drink_orders'
+    order_id = Column(Integer(), ForeignKey('orders.order_id'), nullable=False)
+    drink_id = Column(Integer(), ForeignKey('drinks.drink_id'), nullable=False)
+    amount = Column(Integer(), nullable=False)
 
 def main():
     print(repr(Pizza.__table__))
