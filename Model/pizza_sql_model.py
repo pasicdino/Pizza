@@ -236,6 +236,11 @@ def find_single_drink(**kwargs):
     return result
 
 
+def find_single_dessert(**kwargs):
+    result = db.session.query(Desserts).filter_by(**kwargs).first()
+    return result
+
+
 def find_number_of_pizzas():
     result = db.session.query(func.count(Pizzas.pizza_id))
     return result
