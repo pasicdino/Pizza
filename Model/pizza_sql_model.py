@@ -1,9 +1,13 @@
+from pathlib import Path
 from app import app
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
+Path("db").mkdir(parents=True, exist_ok=True)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:TimeforPizza@localhost/pizza"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 
 class Pizzas(db.Model):
     __tablename__ = 'pizzas'
@@ -111,6 +115,7 @@ class DrinkOrders(db.Model):
     drink_id = db.Column(db.Integer(), db.ForeignKey('drinks.drink_id'), primary_key=True, nullable=False)
     amount = db.Column(db.Integer(), nullable=False)
 
+
 def initialize_database():
     db.create_all()
     db.session.add(Pizzas(pizza_name='Margherita', vegetarian=True))
@@ -200,14 +205,51 @@ def initialize_database():
     db.session.add(Desserts(dessert_name='Ice Cream', dessert_price=3.00))
     db.session.commit()
 
-    db.session.add(DeliveryPersons(first_name='Dino', last_name='Pasic', email='01dino@live.nl', phone_number='0683329208', street_name='Kant', street_number='20', city='Kerkrade'))
-    db.session.add(DeliveryPersons(first_name='Laurence', last_name='Nickel', email='laurencenickel00@gmail.com', phone_number='0630409715', street_name='Putstraat', street_number='30', city='Kerkrade'))
-    db.session.add(DeliveryPersons(first_name='Chris', last_name='Smalling', email='chris.smalling@outlook.com', phone_number='0637295017', street_name='Welterlaan', street_number='16', city='Heerlen'))
-    db.session.add(DeliveryPersons(first_name='Phil', last_name='Jones', email='jonesphil@gmail.com', phone_number='0675942167', street_name='Akerstraat', street_number='83', city='Heerlen'))
-    db.session.add(DeliveryPersons(first_name='Bukayo', last_name='Saka', email='bukayosaka7@gmail.com', phone_number='0613248794', street_name='Ringoven', street_number='60', city='Landgraaf'))
-    db.session.add(DeliveryPersons(first_name='Sead', last_name='Kolasinac', email='seadkolasinac@live.nl', phone_number='0645971348', street_name='Eijkhagenlaan', street_number='31', city='Landgraaf'))
+    db.session.add(
+        DeliveryPersons(first_name='Dino', last_name='Pasic', email='01dino@live.nl', phone_number='0683329208',
+                        street_name='Kant', street_number='20', city='Kerkrade'))
+    db.session.add(DeliveryPersons(first_name='Laurence', last_name='Nickel', email='laurencenickel00@gmail.com',
+                                   phone_number='0630409715', street_name='Putstraat', street_number='30',
+                                   city='Kerkrade'))
+    db.session.add(DeliveryPersons(first_name='Chris', last_name='Smalling', email='chris.smalling@outlook.com',
+                                   phone_number='0637295017', street_name='Welterlaan', street_number='16',
+                                   city='Heerlen'))
+    db.session.add(
+        DeliveryPersons(first_name='Phil', last_name='Jones', email='jonesphil@gmail.com', phone_number='0675942167',
+                        street_name='Akerstraat', street_number='83', city='Heerlen'))
+    db.session.add(
+        DeliveryPersons(first_name='Bukayo', last_name='Saka', email='bukayosaka7@gmail.com', phone_number='0613248794',
+                        street_name='Ringoven', street_number='60', city='Landgraaf'))
+    db.session.add(DeliveryPersons(first_name='Sead', last_name='Kolasinac', email='seadkolasinac@live.nl',
+                                   phone_number='0645971348', street_name='Eijkhagenlaan', street_number='31',
+                                   city='Landgraaf'))
     db.session.commit()
 
-# if __name__ == "__main__":
-#     initialize_database()
+
+def find_single_pizza(**kwargs):
+    result = db.session.query(Pizzas).filter_by(**kwargs).first()
+    return result
+
+
+def find_single_drink(**kwargs):
+    result = db.session.query(Drinks).filter_by(**kwargs).first()
+    return result
+
+
+def find_number_of_pizzas():
+    result = db.session.query(func.count(Pizzas.pizza_id))
+    return result
+
+
+def find_price_of_pizza(**kwargs):
+    result = db.session.query(Pizzas).innerjoin(PizzaToppings, Pizzas.pizza_id == PizzaToppings.pizza_id).innerjoin(Toppings, Toppings.topping_id == PizzaToppings.topping_id).filter_by(**kwargs).first()
+    return result
+
+
+#SELECT pizzas.pizza_id, pizzas.pizza_name, SUM(toppings.topping_price) FROM pizzas INNER JOIN pizza_toppings ON pizza_toppings.pizza_id=pizzas.pizza_id INNER JOIN toppings ON toppings.topping_id=pizza_toppings.topping_id WHERE pizzas.pizza_id = 1 GROUP BY pizzas.pizza_id;
+
+
+def find_size_price(**kwargs):
+    result = db.session.query(Sizes).filter_by(**kwargs).first()
+    return result
 
