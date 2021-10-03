@@ -14,6 +14,14 @@ def get_pizza(pizza_id: int):
     else:
         return make_response({"error": f"Pizza with pizza_id {pizza_id} does not exist"})
 
+@app.route("/pizza/<pizza_id>")
+def get_pizzaVegetarian(pizza_id: int):
+    pizza = get_pizza(pizza_id)
+    if pizza:
+        return make_response({"vegetarian": pizza.vegetarian})
+    else:
+        return make_response({"error": f"Vegetarian label on pizza with pizza_id {pizza_id} does not exist"})
+
 
 @app.route("/drink/<drink_id>")
 def get_drink(drink_id: int):

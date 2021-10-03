@@ -276,6 +276,9 @@ def check_kind_of_order(kind_selected):
 if __name__ == "__main__":
     while True:
         answers = prompt(start_menu)
+
+def seeMenu():
+    response =
         answer = answers["start"]
         if answer == "See the menu":
             while True:
