@@ -1,3 +1,5 @@
+import sys
+
 from PyInquirer import prompt, Separator
 import requests
 import json
@@ -116,6 +118,49 @@ def get_dessert_ordered():
     dessert_orders.append(Separator(""))
     return dessert_orders
 
+
+email_customer = "empty"
+city_customer = "empty"
+
+
+def verify_login(email, password):
+    response = requests.post(BASE_URL + "/login", data={"email": email, "password": password})
+    email_customer = email
+    city_customer = find_city_by_email(email)
+
+
+def verify_sign_up(email, password, first_name, last_name, phone_number, street_name, street_number, city):
+    response = requests.post(BASE_URL + "/signup", data={"email": email, "password": password, "first_name": first_name, "last_name": last_name, "phone number": phone_number, "street_name": street_name, "street_number": street_number, "city": city})
+    email_customer = email
+    city_customer = city
+
+
+def find_city_by_email(email):
+    response = requests.post(BASE_URL + "/city")
+    result = json.loads(response.text)
+    string = result["city"]
+    return string
+
+home = {
+    "type": "list",
+    "name": "home",
+    "message": "Welcome to Back to the Pizza in Hill Valley. Do you already have an account or do you want to sign up? Once you are signed up, you are logged in",
+    "choices": ["Log in", "Sign up", "Quit"]
+}
+
+login_questions = [
+    {"type": "input", "name": "email", "message": "Please enter your email"},
+    {"type": "password", "name": "password", "message": "Please enter your password"}
+]
+
+sign_up_questions = login_questions + [
+    {"type": "input", "name": "first_name", "message": "Please enter your first name"},
+    {"type": "input", "name": "last_name", "message": "Please enter your last name"},
+    {"type": "input", "name": "phone_number", "message": "Please enter your phone number"},
+    {"type": "input", "name": "street_name", "message": "Please enter your street name"},
+    {"type": "input", "name": "street_number", "message": "Please enter your street number"},
+    {"type": "input", "name": "city", "message": "Please choose either Kerkrade, Heerlen or Landgraaf as your city"}
+]
 
 start_menu = {
     "type": "list",
@@ -276,6 +321,17 @@ def deletePizzaFromOrder(pizza_selected):
     if pizza_selected != "Pizzas"
 
 if __name__ == "__main__":
+    login_information = prompt(home)
+    information_selected = login_information["home"]
+    if information_selected == "Log in":
+        login_answers = prompt(login_questions)
+        verify_login(**login_answers)
+    if information_selected == "Sign up":
+        sign_up_answers = prompt(sign_up_questions)
+        verify_sign_up(**sign_up_answers)
+    if information_selected == "Quit":
+        sys.exit()
+
     while True:
         answers = prompt(start_menu)
         answer = answers["start"]
@@ -302,14 +358,11 @@ if __name__ == "__main__":
                 order_selected = orders["orders"]
                 if order_selected == "Go back":
                     break
-                check_for_order_type(order_selected)
+                #check_for_order_type(order_selected)
                 #break
 
-
-
         # if answer == "Place your order":
-            # Customer must fill in email-address.
-            # Customer must also fill in address, mainly for determining delivery person and attach that id to the order.
+        #     while True:
 
         if answer == "Quit":
             break
