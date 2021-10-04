@@ -18,7 +18,7 @@ def get_pizza(pizza_id: int):
 def get_pizzaVegetarian(pizza_id: int):
     pizza = get_pizza(pizza_id)
     if pizza:
-        return make_response({"vegetarian": pizza.vegetarian})
+        return make_response({"vegetarian": pizza.vegetarian}, 200)
     else:
         return make_response({"error": f"Vegetarian label on pizza with pizza_id {pizza_id} does not exist"})
 

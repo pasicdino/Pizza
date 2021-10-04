@@ -272,13 +272,12 @@ def check_kind_of_order(kind_selected):
 # def delete_item(menu):
 #     if
 
+def deletePizzaFromOrder(pizza_selected):
+    if pizza_selected != "Pizzas"
 
 if __name__ == "__main__":
     while True:
         answers = prompt(start_menu)
-
-def seeMenu():
-    response =
         answer = answers["start"]
         if answer == "See the menu":
             while True:
