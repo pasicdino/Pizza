@@ -75,6 +75,7 @@ class Customers(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(255), nullable=False, unique=True)
+    hashed_password = db.Column(db.String(50), nullable=False)
     phone_number = db.Column(db.String(50), nullable=False)
     street_name = db.Column(db.String(255), nullable=False)
     street_number = db.Column(db.String(50), nullable=False)
@@ -258,3 +259,18 @@ def find_size_price(**kwargs):
     result = db.session.query(Sizes).filter_by(**kwargs).first()
     return result
 
+
+def find_single_customer(**kwargs):
+    result = db.session.query(Customers).filter_by(**kwargs).first()
+    return result
+
+
+def create_new_customer(first_name, last_name, email, hashed_pw, phone_number, street_name, street_number, city):
+    new_customer = Customers(first_name=first_name, last_name=last_name, email=email, hashed_password=hashed_pw, phone_number=phone_number, street_name=street_name, street_number=street_number, city=city)
+    db.session.add(new_customer)
+    db.session.commit()
+    return new_customer
+
+
+def find_city_by_email(email):
+    result = db.session.query(Customers).filter_by(email).first()
