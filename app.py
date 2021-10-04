@@ -16,6 +16,7 @@ def get_pizza(pizza_id: int):
     else:
         return make_response({"error": f"Pizza with pizza_id {pizza_id} does not exist"})
 
+
 @app.route("/pizza/<pizza_id>")
 def get_pizzaVegetarian(pizza_id: int):
     pizza = get_pizza(pizza_id)
@@ -72,8 +73,8 @@ def find_city(email):
 
 @app.route("/login", methods=["POST"])
 def check_customer():
-    email = request.form["email"]
-    password = request.form["password"]
+    email = request.form.get('email')
+    password = request.form.get('password')
 
     the_customer = find_single_customer(email=email)
     if the_customer is None:
