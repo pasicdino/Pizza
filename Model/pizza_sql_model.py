@@ -265,8 +265,8 @@ def find_single_customer(**kwargs):
     return result
 
 
-def create_new_customer(first_name, last_name, email, hashed_pw, phone_number, street_name, street_number, city):
-    new_customer = Customers(first_name=first_name, last_name=last_name, email=email, hashed_password=hashed_pw, phone_number=phone_number, street_name=street_name, street_number=street_number, city=city)
+def create_new_customer(**kwargs):
+    new_customer = Customers(**kwargs)
     db.session.add(new_customer)
     db.session.commit()
     return new_customer

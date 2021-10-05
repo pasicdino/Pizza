@@ -107,7 +107,7 @@ def create_customer():
         return make_response({"error": "Password does not meet complexity", "failed": message}, 400)
 
     try:
-        create_new_customer(first_name, last_name, email, hash_password(password), phone_number, street_name, street_number, city)
+        create_new_customer(first_name=first_name, last_name=last_name, email=email, hashed_password=hash_password(password), phone_number=phone_number, street_name=street_name, street_number=street_number, city=city)
     except Exception as ex:
         print(f"Could not create customer with email: {email}")
         return make_response({"error": f"Could not create customer with email: {email}"}, 400)
