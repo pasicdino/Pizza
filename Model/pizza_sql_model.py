@@ -116,115 +116,116 @@ class DrinkOrders(db.Model):
     drink_id = db.Column(db.Integer(), db.ForeignKey('drinks.drink_id'), primary_key=True, nullable=False)
     amount = db.Column(db.Integer(), nullable=False)
 
-
 def initialize_database():
-    db.create_all()
-    db.session.add(Pizzas(pizza_name='Margherita', vegetarian=True))
-    db.session.add(Pizzas(pizza_name='Tonno', vegetarian=True))
-    db.session.add(Pizzas(pizza_name='Hawaii', vegetarian=False))
-    db.session.add(Pizzas(pizza_name='Pepperoni', vegetarian=False))
-    db.session.add(Pizzas(pizza_name='Pollo', vegetarian=False))
-    db.session.add(Pizzas(pizza_name='Funghi', vegetarian=True))
-    db.session.add(Pizzas(pizza_name='Mozzarella', vegetarian=True))
-    db.session.add(Pizzas(pizza_name='Taco', vegetarian=False))
-    db.session.add(Pizzas(pizza_name='Vegetariana', vegetarian=True))
-    db.session.add(Pizzas(pizza_name='Scampi', vegetarian=True))
-    db.session.commit()
+    # db.create_all()
+    # db.session.add(Pizzas(pizza_name='Margherita', vegetarian=True))
+    # db.session.add(Pizzas(pizza_name='Tonno', vegetarian=True))
+    # db.session.add(Pizzas(pizza_name='Hawaii', vegetarian=False))
+    # db.session.add(Pizzas(pizza_name='Pepperoni', vegetarian=False))
+    # db.session.add(Pizzas(pizza_name='Pollo', vegetarian=False))
+    # db.session.add(Pizzas(pizza_name='Funghi', vegetarian=True))
+    # db.session.add(Pizzas(pizza_name='Mozzarella', vegetarian=True))
+    # db.session.add(Pizzas(pizza_name='Taco', vegetarian=False))
+    # db.session.add(Pizzas(pizza_name='Vegetariana', vegetarian=True))
+    # db.session.add(Pizzas(pizza_name='Scampi', vegetarian=True))
+    # db.session.commit()
+    #
+    # db.session.add(Toppings(topping='cheese', topping_price=1.50))
+    # db.session.add(Toppings(topping='tomato sauce', topping_price=1.00))
+    # db.session.add(Toppings(topping='tuna', topping_price=2.50))
+    # db.session.add(Toppings(topping='pineapple', topping_price=1.00))
+    # db.session.add(Toppings(topping='ham', topping_price=2.50))
+    # db.session.add(Toppings(topping='salami', topping_price=2.50))
+    # db.session.add(Toppings(topping='chicken', topping_price=2.50))
+    # db.session.add(Toppings(topping='corn', topping_price=0.50))
+    # db.session.add(Toppings(topping='bell pepper', topping_price=0.50))
+    # db.session.add(Toppings(topping='spinach', topping_price=0.50))
+    # db.session.add(Toppings(topping='mozzarella', topping_price=1.50))
+    # db.session.add(Toppings(topping='cherry tomatoes', topping_price=0.50))
+    # db.session.add(Toppings(topping='garlic sauce', topping_price=0.50))
+    # db.session.add(Toppings(topping='minced meat', topping_price=2.50))
+    # db.session.add(Toppings(topping='olives', topping_price=0.50))
+    # db.session.add(Toppings(topping='zucchini', topping_price=0.50))
+    # db.session.add(Toppings(topping='shrimp', topping_price=2.50))
+    # db.session.add(Toppings(topping='mushroom', topping_price=0.50))
+    # db.session.commit()
+    #
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=1))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=2))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=3))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=4))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=5))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=6))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=7))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=8))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=9))
+    # db.session.add(PizzaToppings(topping_id=1, pizza_id=10))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=1))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=2))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=3))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=4))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=5))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=6))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=7))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=8))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=9))
+    # db.session.add(PizzaToppings(topping_id=2, pizza_id=10))
+    # db.session.add(PizzaToppings(topping_id=3, pizza_id=2))
+    # db.session.add(PizzaToppings(topping_id=4, pizza_id=3))
+    # db.session.add(PizzaToppings(topping_id=5, pizza_id=3))
+    # db.session.add(PizzaToppings(topping_id=6, pizza_id=4))
+    # db.session.add(PizzaToppings(topping_id=7, pizza_id=5))
+    # db.session.add(PizzaToppings(topping_id=8, pizza_id=5))
+    # db.session.add(PizzaToppings(topping_id=8, pizza_id=9))
+    # db.session.add(PizzaToppings(topping_id=9, pizza_id=5))
+    # db.session.add(PizzaToppings(topping_id=10, pizza_id=5))
+    # db.session.add(PizzaToppings(topping_id=10, pizza_id=9))
+    # db.session.add(PizzaToppings(topping_id=11, pizza_id=7))
+    # db.session.add(PizzaToppings(topping_id=12, pizza_id=7))
+    # db.session.add(PizzaToppings(topping_id=13, pizza_id=8))
+    # db.session.add(PizzaToppings(topping_id=14, pizza_id=8))
+    # db.session.add(PizzaToppings(topping_id=15, pizza_id=9))
+    # db.session.add(PizzaToppings(topping_id=16, pizza_id=9))
+    # db.session.add(PizzaToppings(topping_id=17, pizza_id=10))
+    # db.session.add(PizzaToppings(topping_id=18, pizza_id=6))
+    # db.session.commit()
+    #
+    # db.session.add(Sizes(size='Small', price='3.00'))
+    # db.session.add(Sizes(size='Medium', price='4.50'))
+    # db.session.add(Sizes(size='Large', price='6.00'))
+    # db.session.commit()
+    #
+    # db.session.add(Drinks(drink_name='Fanta', drink_price=2.50))
+    # db.session.add(Drinks(drink_name='Coca Cola', drink_price=2.50))
+    # db.session.add(Drinks(drink_name='Sprite', drink_price=2.50))
+    # db.session.add(Drinks(drink_name='Water', drink_price=1.50))
+    # db.session.commit()
+    #
+    # db.session.add(Desserts(dessert_name='Tiramisu', dessert_price=4.00))
+    # db.session.add(Desserts(dessert_name='Ice Cream', dessert_price=3.00))
+    # db.session.commit()
+    #
+    # db.session.add(
+    #     DeliveryPersons(first_name='Dino', last_name='Pasic', email='01dino@live.nl', phone_number='0683329208',
+    #                     street_name='Kant', street_number='20', city='Kerkrade'))
+    # db.session.add(DeliveryPersons(first_name='Laurence', last_name='Nickel', email='laurencenickel00@gmail.com',
+    #                                phone_number='0630409715', street_name='Putstraat', street_number='30',
+    #                                city='Kerkrade'))
+    # db.session.add(DeliveryPersons(first_name='Chris', last_name='Smalling', email='chris.smalling@outlook.com',
+    #                                phone_number='0637295017', street_name='Welterlaan', street_number='16',
+    #                                city='Heerlen'))
+    # db.session.add(
+    #     DeliveryPersons(first_name='Phil', last_name='Jones', email='jonesphil@gmail.com', phone_number='0675942167',
+    #                     street_name='Akerstraat', street_number='83', city='Heerlen'))
+    # db.session.add(
+    #     DeliveryPersons(first_name='Bukayo', last_name='Saka', email='bukayosaka7@gmail.com', phone_number='0613248794',
+    #                     street_name='Ringoven', street_number='60', city='Landgraaf'))
+    # db.session.add(DeliveryPersons(first_name='Sead', last_name='Kolasinac', email='seadkolasinac@live.nl',
+    #                                phone_number='0645971348', street_name='Eijkhagenlaan', street_number='31',
+    #                                city='Landgraaf'))
+    # db.session.commit()
 
-    db.session.add(Toppings(topping='cheese', topping_price=1.50))
-    db.session.add(Toppings(topping='tomato sauce', topping_price=1.00))
-    db.session.add(Toppings(topping='tuna', topping_price=2.50))
-    db.session.add(Toppings(topping='pineapple', topping_price=1.00))
-    db.session.add(Toppings(topping='ham', topping_price=2.50))
-    db.session.add(Toppings(topping='salami', topping_price=2.50))
-    db.session.add(Toppings(topping='chicken', topping_price=2.50))
-    db.session.add(Toppings(topping='corn', topping_price=0.50))
-    db.session.add(Toppings(topping='bell pepper', topping_price=0.50))
-    db.session.add(Toppings(topping='spinach', topping_price=0.50))
-    db.session.add(Toppings(topping='mozzarella', topping_price=1.50))
-    db.session.add(Toppings(topping='cherry tomatoes', topping_price=0.50))
-    db.session.add(Toppings(topping='garlic sauce', topping_price=0.50))
-    db.session.add(Toppings(topping='minced meat', topping_price=2.50))
-    db.session.add(Toppings(topping='olives', topping_price=0.50))
-    db.session.add(Toppings(topping='zucchini', topping_price=0.50))
-    db.session.add(Toppings(topping='shrimp', topping_price=2.50))
-    db.session.add(Toppings(topping='mushroom', topping_price=0.50))
-    db.session.commit()
-
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=1))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=2))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=3))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=4))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=5))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=6))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=7))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=8))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=9))
-    db.session.add(PizzaToppings(topping_id=1, pizza_id=10))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=1))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=2))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=3))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=4))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=5))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=6))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=7))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=8))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=9))
-    db.session.add(PizzaToppings(topping_id=2, pizza_id=10))
-    db.session.add(PizzaToppings(topping_id=3, pizza_id=2))
-    db.session.add(PizzaToppings(topping_id=4, pizza_id=3))
-    db.session.add(PizzaToppings(topping_id=5, pizza_id=3))
-    db.session.add(PizzaToppings(topping_id=6, pizza_id=4))
-    db.session.add(PizzaToppings(topping_id=7, pizza_id=5))
-    db.session.add(PizzaToppings(topping_id=8, pizza_id=5))
-    db.session.add(PizzaToppings(topping_id=8, pizza_id=9))
-    db.session.add(PizzaToppings(topping_id=9, pizza_id=5))
-    db.session.add(PizzaToppings(topping_id=10, pizza_id=5))
-    db.session.add(PizzaToppings(topping_id=10, pizza_id=9))
-    db.session.add(PizzaToppings(topping_id=11, pizza_id=7))
-    db.session.add(PizzaToppings(topping_id=12, pizza_id=7))
-    db.session.add(PizzaToppings(topping_id=13, pizza_id=8))
-    db.session.add(PizzaToppings(topping_id=14, pizza_id=8))
-    db.session.add(PizzaToppings(topping_id=15, pizza_id=9))
-    db.session.add(PizzaToppings(topping_id=16, pizza_id=9))
-    db.session.add(PizzaToppings(topping_id=17, pizza_id=10))
-    db.session.add(PizzaToppings(topping_id=18, pizza_id=6))
-    db.session.commit()
-
-    db.session.add(Sizes(size='Small', price='3.00'))
-    db.session.add(Sizes(size='Medium', price='4.50'))
-    db.session.add(Sizes(size='Large', price='6.00'))
-    db.session.commit()
-
-    db.session.add(Drinks(drink_name='Fanta', drink_price=2.50))
-    db.session.add(Drinks(drink_name='Coca Cola', drink_price=2.50))
-    db.session.add(Drinks(drink_name='Sprite', drink_price=2.50))
-    db.session.add(Drinks(drink_name='Water', drink_price=1.50))
-    db.session.commit()
-
-    db.session.add(Desserts(dessert_name='Tiramisu', dessert_price=4.00))
-    db.session.add(Desserts(dessert_name='Ice Cream', dessert_price=3.00))
-    db.session.commit()
-
-    db.session.add(
-        DeliveryPersons(first_name='Dino', last_name='Pasic', email='01dino@live.nl', phone_number='0683329208',
-                        street_name='Kant', street_number='20', city='Kerkrade'))
-    db.session.add(DeliveryPersons(first_name='Laurence', last_name='Nickel', email='laurencenickel00@gmail.com',
-                                   phone_number='0630409715', street_name='Putstraat', street_number='30',
-                                   city='Kerkrade'))
-    db.session.add(DeliveryPersons(first_name='Chris', last_name='Smalling', email='chris.smalling@outlook.com',
-                                   phone_number='0637295017', street_name='Welterlaan', street_number='16',
-                                   city='Heerlen'))
-    db.session.add(
-        DeliveryPersons(first_name='Phil', last_name='Jones', email='jonesphil@gmail.com', phone_number='0675942167',
-                        street_name='Akerstraat', street_number='83', city='Heerlen'))
-    db.session.add(
-        DeliveryPersons(first_name='Bukayo', last_name='Saka', email='bukayosaka7@gmail.com', phone_number='0613248794',
-                        street_name='Ringoven', street_number='60', city='Landgraaf'))
-    db.session.add(DeliveryPersons(first_name='Sead', last_name='Kolasinac', email='seadkolasinac@live.nl',
-                                   phone_number='0645971348', street_name='Eijkhagenlaan', street_number='31',
-                                   city='Landgraaf'))
-    db.session.commit()
+    print(find_price_of_pizza("4"))
 
 
 def find_single_pizza(**kwargs):
@@ -247,8 +248,8 @@ def find_number_of_pizzas():
     return result
 
 
-def find_price_of_pizza(**kwargs):
-    result = db.session.query(Pizzas).innerjoin(PizzaToppings, Pizzas.pizza_id == PizzaToppings.pizza_id).innerjoin(Toppings, Toppings.topping_id == PizzaToppings.topping_id).filter_by(**kwargs).first()
+def find_price_of_pizza(id: str):
+    result = db.session.query(Pizzas, Toppings).join(PizzaToppings, Pizzas.pizza_id == PizzaToppings.pizza_id).join(Toppings, Toppings.topping_id == PizzaToppings.topping_id).filter(Pizzas.pizza_id==id).all()
     return result
 
 
@@ -267,14 +268,14 @@ def find_single_customer(**kwargs):
 
 def create_new_customer(**kwargs):
     new_customer = Customers(**kwargs)
-    print("METHOD")
     db.session.add(new_customer)
-    print("METHOD 1111")
-    print(new_customer)
     db.session.commit()
-    print("METHOD 2222")
     return new_customer
 
 
 def find_city_by_email(email):
     result = db.session.query(Customers).filter_by(email).first()
+
+
+if __name__ == "__main__":
+    initialize_database()

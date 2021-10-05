@@ -120,13 +120,11 @@ def get_dessert_ordered():
 
 
 email_customer = "empty"
-city_customer = "empty"
 
 
 def verify_login(email, password):
     response = requests.post(BASE_URL + "/login", data={"email": email, "password": password})
     email_customer = email
-    #city_customer = find_city_by_email(email)
 
 
 def verify_sign_up(email, password, first_name, last_name, phone_number, street_name, street_number, city):
