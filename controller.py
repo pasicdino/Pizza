@@ -34,8 +34,8 @@ def hash_password(password: str):
 
 def check_password(the_customer: Customers, password: str):
     # Getting the values back out
-    salt = the_customer.password[:32]  # 32 is the length of the salt
-    key = the_customer.password[32:]
+    salt = the_customer.hashed_password[:32]  # 32 is the length of the salt
+    key = the_customer.hashed_password[32:]
     for pepper_letter in pepper_letters:
         for pep_loc in range(len(password)):
             pepper_password = password[:pep_loc] + pepper_letter + password[pep_loc:]

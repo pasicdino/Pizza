@@ -75,8 +75,8 @@ class Customers(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(255), nullable=False, unique=True)
-    hashed_password = db.Column(db.String(50), nullable=False)
-    phone_number = db.Column(db.String(50), nullable=False)
+    hashed_password = db.Column(db.LargeBinary, nullable=False)
+    phone_number = db.Column(db.String(50), nullable=True)
     street_name = db.Column(db.String(255), nullable=False)
     street_number = db.Column(db.String(50), nullable=False)
     city = db.Column(db.String(50), nullable=False)
@@ -267,8 +267,12 @@ def find_single_customer(**kwargs):
 
 def create_new_customer(**kwargs):
     new_customer = Customers(**kwargs)
+    print("METHOD")
     db.session.add(new_customer)
+    print("METHOD 1111")
+    print(new_customer)
     db.session.commit()
+    print("METHOD 2222")
     return new_customer
 
 

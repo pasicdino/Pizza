@@ -126,7 +126,7 @@ city_customer = "empty"
 def verify_login(email, password):
     response = requests.post(BASE_URL + "/login", data={"email": email, "password": password})
     email_customer = email
-    city_customer = find_city_by_email(email)
+    #city_customer = find_city_by_email(email)
 
 
 def verify_sign_up(email, password, first_name, last_name, phone_number, street_name, street_number, city):
@@ -213,10 +213,10 @@ desserts_ordered = {
     "choices": get_dessert_ordered()
 }
 
-delete_item = {
+place_order = {
     "type": "list",
-    "name": "deletion",
-    "message": "Do you want to delete this item?",
+    "name": "place_order",
+    "message": "Are you sure you want to place your order?",
     "choices": ["Yes", "No"]
 }
 
@@ -319,16 +319,16 @@ def check_kind_of_order(kind_selected):
 
 
 if __name__ == "__main__":
-    login_information = prompt(home)
-    information_selected = login_information["home"]
-    if information_selected == "Log in":
-        login_answers = prompt(login_questions)
-        verify_login(**login_answers)
-    if information_selected == "Sign up":
-        sign_up_answers = prompt(sign_up_questions)
-        verify_sign_up(**sign_up_answers)
-    if information_selected == "Quit":
-        sys.exit()
+    # login_information = prompt(home)
+    # information_selected = login_information["home"]
+    # if information_selected == "Log in":
+    #     login_answers = prompt(login_questions)
+    #     verify_login(**login_answers)
+    # if information_selected == "Sign up":
+    #     sign_up_answers = prompt(sign_up_questions)
+    #     verify_sign_up(**sign_up_answers)
+    # if information_selected == "Quit":
+    #     sys.exit()
 
     while True:
         answers = prompt(start_menu)
@@ -359,8 +359,17 @@ if __name__ == "__main__":
                 #check_for_order_type(order_selected)
                 #break
 
-        # if answer == "Place your order":
-        #     while True:
+        if answer == "Place your order":
+            while True:
+                order_placed = prompt(place_order)
+                order_placed_selected = order_placed["place_order"]
+                if order_placed_selected == "Yes":
+                    #TODO: Order place logic
+                    value = 1
+                else:
+                    break
+
+
 
         if answer == "Quit":
             break
