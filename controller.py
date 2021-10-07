@@ -74,3 +74,11 @@ def password_complexity(password):
         return message
     else:
         return False
+
+
+def set_every_item_to_string(initial_string: str, dict_to_attach):
+    string = initial_string
+    iterable_dict = dict_to_attach.items()
+    for value in iterable_dict:
+        string = string + str(value)
+    return string

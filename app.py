@@ -1,29 +1,50 @@
+import json
+
 from flask import Flask, request, make_response
 
 app = Flask(__name__)
 
 from Model.pizza_sql_model import find_single_pizza, find_number_of_pizzas, find_size_price, find_single_drink, \
-    find_single_dessert, find_single_customer, create_new_customer, find_city_by_email
+    find_single_dessert, find_single_customer, create_new_customer, find_city_by_email, find_price_of_pizza, \
+    find_toppings_of_pizza, find_pizza_vegetarian, find_number_of_drinks, find_number_of_desserts
 from controller import password_complexity, check_password, hash_password
 
 INVALID_MESSAGE = "email or password is not valid"
+
+@app.route("/pizzaprice/<pizza_id>")
+def get_price(pizza_id: int):
+    pizza_price = find_price_of_pizza(pizza_id=pizza_id)
+    if pizza_price:
+        return make_response({"0": pizza_price}, 200)
+    else:
+        return make_response({"error": f"Pizza with pizza_id {pizza_id} does not exist"})
+
+
+@app.route("/pizzatoppings/<pizza_id>")
+def get_toppings(pizza_id: int):
+    pizza_toppings = find_toppings_of_pizza(pizza_id=pizza_id)
+    if pizza_toppings:
+        return make_response(pizza_toppings, 200)
+    else:
+        return make_response({"error": f"Pizza with pizza_id {pizza_id} does not exist"})
+
+
+@app.route("/pizzavegetarian/<pizza_id>")
+def get_pizza_vegetarian(pizza_id: int):
+    pizza_vegetarian = find_pizza_vegetarian(pizza_id=pizza_id)
+    if pizza_vegetarian:
+        return make_response({"0": pizza_vegetarian}, 200)
+    else:
+        return make_response({"error": f"Vegetarian label on pizza with pizza_id {pizza_id} does not exist"})
+
 
 @app.route("/pizza/<pizza_id>")
 def get_pizza(pizza_id: int):
     pizza = find_single_pizza(pizza_id=pizza_id)
     if pizza:
-        return make_response({"pizza_name": pizza.pizza_name, "id": pizza_id}, 200)
+        return make_response({"pizza_name": pizza.pizza_name}, 200)
     else:
         return make_response({"error": f"Pizza with pizza_id {pizza_id} does not exist"})
-
-
-@app.route("/pizza/<pizza_id>")
-def get_pizzaVegetarian(pizza_id: int):
-    pizza = get_pizza(pizza_id)
-    if pizza:
-        return make_response({"vegetarian": pizza.vegetarian}, 200)
-    else:
-        return make_response({"error": f"Vegetarian label on pizza with pizza_id {pizza_id} does not exist"})
 
 
 @app.route("/drink/<drink_id>")
@@ -46,11 +67,29 @@ def get_dessert(dessert_id: int):
 
 @app.route("/pizza/count")
 def get_number_of_pizzas():
-    count = len(find_number_of_pizzas())
+    count = find_number_of_pizzas()
     if count:
-        return make_response({"count()": count.count()}, 200)
+        return make_response({"count": count}, 200)
     else:
         return make_response({"error": f"There exists no pizza"})
+
+
+@app.route("/dessert/count")
+def get_number_of_desserts():
+    count = find_number_of_desserts()
+    if count:
+        return make_response({"count": count}, 200)
+    else:
+        return make_response({"error": f"There exists no dessert"})
+
+
+@app.route("/drink/count")
+def get_number_of_drinks():
+    count = find_number_of_drinks()
+    if count:
+        return make_response({"count": count}, 200)
+    else:
+        return make_response({"error": f"There exists no drink"})
 
 
 @app.route("/pizzasize/<size_name>")

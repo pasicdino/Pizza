@@ -134,7 +134,7 @@ def initialize_database():
     # db.session.add(Toppings(topping='tomato sauce', topping_price=1.00))
     # db.session.add(Toppings(topping='tuna', topping_price=2.50))
     # db.session.add(Toppings(topping='pineapple', topping_price=1.00))
-    # db.session.add(Toppings(topping='ham', topping_price=2.50))
+    # db.session.add(Toppings(topping='ham', topping_price=1.00))
     # db.session.add(Toppings(topping='salami', topping_price=2.50))
     # db.session.add(Toppings(topping='chicken', topping_price=2.50))
     # db.session.add(Toppings(topping='corn', topping_price=0.50))
@@ -225,7 +225,7 @@ def initialize_database():
     #                                city='Landgraaf'))
     # db.session.commit()
 
-    print(find_price_of_pizza("4"))
+    print(find_price_of_pizza(pizza_id=1))
 
 
 def find_single_pizza(**kwargs):
@@ -244,16 +244,56 @@ def find_single_dessert(**kwargs):
 
 
 def find_number_of_pizzas():
-    result = db.session.query(func.count(Pizzas.pizza_id))
-    return result
+    last = db.session.query(Pizzas.pizza_id).order_by(Pizzas.pizza_id.desc()).first()
+    highest_id = int(last[0])
+    count = 0
+    for i in range(1, highest_id + 1):
+        if find_single_pizza(pizza_id=i) is not None:
+            count = count + 1
+    return count
 
 
-def find_price_of_pizza(id: str):
-    result = db.session.query(Pizzas, Toppings).join(PizzaToppings, Pizzas.pizza_id == PizzaToppings.pizza_id).join(Toppings, Toppings.topping_id == PizzaToppings.topping_id).filter(Pizzas.pizza_id==id).all()
-    return result
+def find_number_of_desserts():
+    last = db.session.query(Desserts.dessert_id).order_by(Desserts.dessert_id.desc()).first()
+    highest_id = int(last[0])
+    count = 0
+    for i in range(1, highest_id + 1):
+        if find_single_dessert(dessert_id=i) is not None:
+            count = count + 1
+    return count
 
 
-#SELECT pizzas.pizza_id, pizzas.pizza_name, SUM(toppings.topping_price) FROM pizzas INNER JOIN pizza_toppings ON pizza_toppings.pizza_id=pizzas.pizza_id INNER JOIN toppings ON toppings.topping_id=pizza_toppings.topping_id WHERE pizzas.pizza_id = 1 GROUP BY pizzas.pizza_id;
+def find_number_of_drinks():
+    last = db.session.query(Drinks.drink_id).order_by(Drinks.drink_id.desc()).first()
+    highest_id = int(last[0])
+    count = 0
+    for i in range(1, highest_id + 1):
+        if find_single_drink(drink_id=i) is not None:
+            count = count + 1
+    return count
+
+
+def find_toppings_of_pizza(pizza_id: int):
+    result = db.session.query(Toppings.topping).join(PizzaToppings, PizzaToppings.topping_id == Toppings.topping_id).join(Pizzas, Pizzas.pizza_id == PizzaToppings.pizza_id).filter(Pizzas.pizza_id == pizza_id).all()
+    list_holding = []
+    for i in range(0, len(result)):
+        tuple_holding = result[i]
+        list_holding.append(tuple_holding[0])
+    final_result = dict(list(enumerate(list_holding)))
+    print(final_result)
+    return final_result
+
+
+def find_price_of_pizza(pizza_id: int):
+    result = db.session.query(Pizzas.pizza_id, func.sum(Toppings.topping_price).label("total")).join(PizzaToppings, PizzaToppings.pizza_id == Pizzas.pizza_id).join(Toppings, Toppings.topping_id == PizzaToppings.topping_id).filter(Pizzas.pizza_id == pizza_id).group_by(Pizzas.pizza_id).first()
+    result_final = str(result[1])
+    return result_final
+
+
+def find_pizza_vegetarian(**kwargs):
+    result = db.session.query(Pizzas.vegetarian).filter_by(**kwargs).first()
+    result_final = str(result[0])
+    return result_final
 
 
 def find_size_price(**kwargs):

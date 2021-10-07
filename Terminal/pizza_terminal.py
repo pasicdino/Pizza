@@ -4,17 +4,53 @@ from PyInquirer import prompt, Separator
 import requests
 import json
 
+# from ..controller import set_every_item_to_string
+
 BASE_URL = "http://127.0.0.1:5000"
 
 pizza_orders = []
 drink_orders = []
 dessert_orders = []
 
+def get_size_price(size_name):
+    response = requests.get(BASE_URL + "/pizzasize/" + size_name)
+    result = json.loads(response.text)
+    string = result["price"]
+    return string
+
+SMALL_PIZZA_PRICE = float(get_size_price("Small"))
+MEDIUM_PIZZA_PRICE = float(get_size_price("Medium"))
+LARGE_PIZZA_PRICE = float(get_size_price("Large"))
+MEDIUM_MINUS_SMALL = (MEDIUM_PIZZA_PRICE-SMALL_PIZZA_PRICE)
+LARGE_MINUS_SMALL = (LARGE_PIZZA_PRICE-SMALL_PIZZA_PRICE)
 
 def get_pizza(pizza_id):
     response = requests.get(BASE_URL + "/pizza/" + pizza_id)
     result = json.loads(response.text)
     return result["pizza_name"]
+
+def get_pizza_toppings(pizza_id):
+    response = requests.get(BASE_URL + "/pizzatoppings/" + pizza_id)
+    result = json.loads(response.text)
+    initial_string = "Toppings: "
+    string = initial_string
+    iterable_dict = result.items()
+    for key, value in iterable_dict:
+        string = string + str(value) + ", "
+    string = string[:-2]
+    return string
+
+
+def get_pizza_vegetarian(pizza_id):
+    response = requests.get(BASE_URL + "/pizzavegetarian/" + pizza_id)
+    result = json.loads(response.text)
+    result = result["0"]
+    string = "Vegetarian: "
+    if result == "True":
+        string = string + "Yes"
+    else:
+        string = string + "No"
+    return string
 
 
 def get_drink(drink_id):
@@ -29,12 +65,15 @@ def get_dessert(dessert_id):
     return result["dessert_name"]
 
 
-# TODO: Solve query in pizza_sql_model.py containing inner joins. Here we also want to retrieve the toppings and vegetarian.
-def get_pizza_with_price(pizza_id):
-    response = requests.get(BASE_URL + "/pizza/" + pizza_id)
+def get_pizza_with_price_and_toppings(pizza_id):
+    response = requests.get(BASE_URL + "/pizzaprice/" + pizza_id)
     result = json.loads(response.text)
-    string = result["pizza_name"]
-    string = string + " - " + result["id"] + " euros"
+    result_price = float(result["0"])
+    price = str(result_price + SMALL_PIZZA_PRICE)
+    pizza_names = get_pizza(pizza_id)
+    toppings = get_pizza_toppings(pizza_id)
+    vegetarian = get_pizza_vegetarian(pizza_id)
+    string = pizza_names + "   ---   " + price + " euros" + "   ---   " + toppings + "   ---   " + vegetarian
     return string
 
 
@@ -42,7 +81,7 @@ def get_drink_with_price(drink_id):
     response = requests.get(BASE_URL + "/drink/" + drink_id)
     result = json.loads(response.text)
     string = result["drink_name"]
-    string = string + " - " + str(result["drink_price"]) + " euros"
+    string = string + " --- " + str(result["drink_price"]) + " euros"
     return string
 
 
@@ -50,29 +89,30 @@ def get_dessert_with_price(dessert_id):
     response = requests.get(BASE_URL + "/dessert/" + dessert_id)
     result = json.loads(response.text)
     string = result["dessert_name"]
-    string = string + " - " + str(result["dessert_price"]) + " euros"
+    string = string + " --- " + str(result["dessert_price"]) + " euros"
     return string
-
-
-def get_size_price(size_name):
-    response = requests.get(BASE_URL + "/pizzasize/" + size_name)
-    result = json.loads(response.text)
-    string = result["price"]
-    return string
-
-
-SMALL_PIZZA_PRICE = float(get_size_price("Small"))
-MEDIUM_PIZZA_PRICE = float(get_size_price("Medium"))
-LARGE_PIZZA_PRICE = float(get_size_price("Large"))
-MEDIUM_MINUS_SMALL = (MEDIUM_PIZZA_PRICE-SMALL_PIZZA_PRICE)
-LARGE_MINUS_SMALL = (LARGE_PIZZA_PRICE-SMALL_PIZZA_PRICE)
 
 
 def get_number_of_pizzas():
     response = requests.get(BASE_URL + "/pizza/count")
     result = json.loads(response.text)
-    string = result["count()"]
-    return string
+    result = int(result["count"])
+    return result
+
+
+def get_number_of_desserts():
+    response = requests.get(BASE_URL + "/dessert/count")
+    result = json.loads(response.text)
+    result = int(result["count"])
+    return result
+
+
+def get_number_of_drinks():
+    response = requests.get(BASE_URL + "/drink/count")
+    result = json.loads(response.text)
+    result = int(result["count"])
+    return result
+
 
 def get_list_of_drinks():
     drinks = []
@@ -95,7 +135,7 @@ desserts = get_list_of_desserts()
 def get_list_of_pizzas():
     pizzas = []
     for i in range(1, 11):
-        pizzas.append(get_pizza_with_price(str(i)))
+        pizzas.append(get_pizza_with_price_and_toppings(str(i)))
     return pizzas
 
 pizzas = get_list_of_pizzas()
@@ -241,25 +281,18 @@ viewOrder = {
 
 
 def check_for_menu(menu_item_selected):
-    # TODO: Fix get_number_of_pizzas(). Only returns 1
-    # for i in range(1, get_number_of_pizzas() + 1):
-    #     if menu_item_selected.startswith(get_pizza_with_price(str(i))):
-    #         pizza_size = prompt(sizes)
-    #         size_selected = pizza_size["selectSize"]
-    #         check_for_sizes(size_selected, i)
-
-    for i in range(1, 10 + 1):
-        if menu_item_selected.startswith(get_pizza_with_price(str(i))):
+    for i in range(1, get_number_of_pizzas() + 1):
+        if menu_item_selected.startswith(get_pizza_with_price_and_toppings(str(i))):
             pizza_size = prompt(sizes)
             size_selected = pizza_size["selectSize"]
             check_for_sizes(size_selected, i)
 
-    for i in range(1, 5):
+    for i in range(1, get_number_of_drinks() + 1):
         if menu_item_selected.startswith(get_drink_with_price(str(i))):
             print("-----> " + get_drink(str(i)) + " is added to your order!")
             drink_orders.append(get_drink(str(i)))
 
-    for i in range(1, 3):
+    for i in range(1, get_number_of_desserts() + 1):
         if menu_item_selected.startswith(get_dessert_with_price(str(i))):
             print("-----> " + get_dessert(str(i)) + " is added to your order!")
             dessert_orders.append(get_dessert(str(i)))
@@ -286,7 +319,6 @@ def check_kind_of_order(kind_selected):
             pizza_selected = order_pizza["pizzas_ordered"]
             if pizza_selected == "Go back":
                 break
-            #check_for_selected_pizza(pizza_selected)
 
     if kind_selected == "Drinks":
         while True:
@@ -294,7 +326,6 @@ def check_kind_of_order(kind_selected):
             drink_selected = order_drink["drinks_ordered"]
             if drink_selected == "Go back":
                 break
-            #check_for_selected_drink(drink_selected)
 
     if kind_selected == "Desserts":
         while True:
@@ -302,18 +333,6 @@ def check_kind_of_order(kind_selected):
             dessert_selected = order_dessert["desserts_ordered"]
             if dessert_selected == "Go back":
                 break
-            #check_for_selected_dessert(pizza_selected)
-
-
-# def check_for_selected_pizza(pizza_selected):
-#     if pizza_selected.startswith(get_pizza_with_price(str(i))):
-#         pizza = prompt(delete_item)
-#         to_be_deleted = pizza["deletion"]
-#         delete_item(to_be_deleted, )
-#
-#
-# def delete_item(menu):
-#     if
 
 
 if __name__ == "__main__":
