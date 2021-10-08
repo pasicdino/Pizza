@@ -290,6 +290,12 @@ def find_price_of_pizza(pizza_id: int):
     return result_final
 
 
+def find_price_of_pizza_by_name(pizza_name: str):
+    result = db.session.query(Pizzas.pizza_id, func.sum(Toppings.topping_price).label("total")).join(PizzaToppings, PizzaToppings.pizza_id == Pizzas.pizza_id).join(Toppings, Toppings.topping_id == PizzaToppings.topping_id).filter(Pizzas.pizza_name == pizza_name).group_by(Pizzas.pizza_id).first()
+    result_final = str(result[1])
+    return result_final
+
+
 def find_pizza_vegetarian(**kwargs):
     result = db.session.query(Pizzas.vegetarian).filter_by(**kwargs).first()
     result_final = str(result[0])
@@ -313,8 +319,53 @@ def create_new_customer(**kwargs):
     return new_customer
 
 
-def find_city_by_email(email):
-    result = db.session.query(Customers).filter_by(email).first()
+def create_new_order(**kwargs):
+    new_order = Orders(**kwargs)
+    db.session.add(new_order)
+    db.session.commit()
+    return new_order
+
+
+def create_new_pizza_order(**kwargs):
+    new_order = PizzaOrders(**kwargs)
+    db.session.add(new_order)
+    db.session.commit()
+    return new_order
+
+
+def create_new_drink_order(**kwargs):
+    new_order = DrinkOrders(**kwargs)
+    db.session.add(new_order)
+    db.session.commit()
+    return new_order
+
+
+def create_new_dessert_order(**kwargs):
+    new_order = DessertOrders(**kwargs)
+    db.session.add(new_order)
+    db.session.commit()
+    return new_order
+
+
+def find_city(**kwargs):
+    result = db.session.query(Customers).filter_by(**kwargs).first()
+    return result
+
+
+def find_delivery_person(**kwargs):
+    result = db.session.query(DeliveryPersons).filter_by(**kwargs).first()
+    return result
+
+
+def update_order_price(order_id, order_price):
+    result = db.session.query(Orders).filter_by(order_id=order_id).update(dict(order_price=order_price))
+    db.session.commit()
+
+
+def find_latest_order():
+    result = db.session.query(Orders.order_id).order_by(Orders.order_time.desc()).first()
+    latest_order_id = str(result[0])
+    return latest_order_id
 
 
 if __name__ == "__main__":

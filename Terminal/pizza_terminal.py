@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 
 from PyInquirer import prompt, Separator
 import requests
@@ -28,6 +29,13 @@ def get_pizza(pizza_id):
     response = requests.get(BASE_URL + "/pizza/" + pizza_id)
     result = json.loads(response.text)
     return result["pizza_name"]
+
+
+def get_pizza_id(pizza_name):
+    response = requests.get(BASE_URL + "/pizza/" + pizza_name)
+    result = json.loads(response.text)
+    return result["pizza_id"]
+
 
 def get_pizza_toppings(pizza_id):
     response = requests.get(BASE_URL + "/pizzatoppings/" + pizza_id)
@@ -143,28 +151,31 @@ pizzas = get_list_of_pizzas()
 
 def get_pizza_ordered():
     pizza_orders.append("Go back")
-    pizza_orders.append(Separator(""))
+    #pizza_orders.append(Separator(""))
     return pizza_orders
 
 
 def get_drink_ordered():
     drink_orders.append("Go back")
-    drink_orders.append(Separator(""))
+    #drink_orders.append(Separator(""))
     return drink_orders
 
 
 def get_dessert_ordered():
     dessert_orders.append("Go back")
-    dessert_orders.append(Separator(""))
+    #dessert_orders.append(Separator(""))
     return dessert_orders
-
-
-email_customer = "empty"
 
 
 def verify_login(email, password):
     response = requests.post(BASE_URL + "/login", data={"email": email, "password": password})
-    email_customer = email
+    result = json.loads(response.text)
+    if result["response"] == "success":
+        print("-----> LOGIN WAS SUCCESSFUL")
+        return email
+    else:
+        print("-----> LOGIN WAS NOT SUCCESSFUL")
+        return sys.exit()
 
 
 def verify_sign_up(email, password, first_name, last_name, phone_number, street_name, street_number, city):
@@ -173,11 +184,27 @@ def verify_sign_up(email, password, first_name, last_name, phone_number, street_
     city_customer = city
 
 
-def find_city_by_email(email):
-    response = requests.post(BASE_URL + "/city")
+def get_city_by_email(email):
+    response = requests.get(BASE_URL + "/city/" + email)
     result = json.loads(response.text)
     string = result["city"]
     return string
+
+
+def get_delivery_person_by_city(city):
+    response = requests.get(BASE_URL + "/deliveryperson/" + city)
+    result = json.loads(response.text)
+    result_delivery_person = result["delivery_person_id"]
+    return result_delivery_person
+
+
+def get_pizza_price(pizza_name):
+    response = requests.get(BASE_URL + "/pizzapricebyname/" + pizza_name)
+    result = json.loads(response.text)
+    result_price = float(result["0"])
+    price = result_price + SMALL_PIZZA_PRICE
+    return price
+
 
 home = {
     "type": "list",
@@ -212,7 +239,7 @@ start_menu = {
 menu = {
     "type": "list",
     "name": "menu",
-    "message": "Select which items you want to order (prices are small pizza).",
+    "message": "Select which items you want to order, the prices for the pizzas are the prices for a small pizza.",
     "choices": [Separator("-- Pizzas --"), pizzas[0], pizzas[1], pizzas[2], pizzas[3], pizzas[4], pizzas[5], pizzas[6], pizzas[7], pizzas[8], pizzas[9], Separator(" "), Separator("-- Drinks --"), drinks[0], drinks[1], drinks[2], drinks[3], Separator(" "), Separator("-- Desserts --"), desserts[0], desserts[1], Separator(""), "Go back"]
 }
 
@@ -233,21 +260,21 @@ which_kind_of_order = {
 pizzas_ordered = {
     "type": "list",
     "name": "pizzas_ordered",
-    "message": "Here are the pizzas present in your order. Select one to delete it, otherwise select 'go back'",
+    "message": "Here are the pizzas present in your order.",
     "choices": get_pizza_ordered()
 }
 
 drinks_ordered = {
     "type": "list",
     "name": "drinks_ordered",
-    "message": "Here are the drinks present in your order. Select one to delete it, otherwise select 'go back'",
+    "message": "Here are the drinks present in your order.",
     "choices": get_drink_ordered()
 }
 
 desserts_ordered = {
     "type": "list",
     "name": "desserts_ordered",
-    "message": "Here are the desserts present in your order. Select one to delete it, otherwise select 'go back'",
+    "message": "Here are the desserts present in your order.",
     "choices": get_dessert_ordered()
 }
 
@@ -335,17 +362,137 @@ def check_kind_of_order(kind_selected):
                 break
 
 
+def get_info_for_order_customer(email_customer):
+    response = requests.get(BASE_URL + "/customer/" + email_customer)
+    result = json.loads(response.text)
+    customer_id = result["customer_id"]
+    return customer_id
+
+
+def get_info_for_order_city(email_customer):
+    city = get_city_by_email(email_customer)
+    delivery_person_id = get_delivery_person_by_city(city)
+    return delivery_person_id
+
+
+def create_order(customer_id_order, order_time, delivery_person_id_order):
+    response = requests.post(BASE_URL + "/order/create", data={"customer_id": customer_id_order, "order_time": order_time, "order_price": 0, "delivery_person_id": delivery_person_id_order})
+    order_id = get_latest_order()
+    return order_id
+
+
+def get_latest_order():
+    response = requests.get(BASE_URL + "/order/latest")
+    result = json.loads(response.text)
+    order_id_latest = result["order_id"]
+    return order_id_latest
+
+
+def set_price_for_order(price):
+    response = requests.post(BASE_URL + "/order/updateprice", data={"order_price": price, "order_id": order_id})
+
+
+def create_dict_of_counts(list_of_orders):
+    dict_of_counts = {item:list_of_orders.count(item) for item in list_of_orders}
+    return dict_of_counts
+
+
+def get_info_for_pizza_orders():
+    pizza_counts = create_dict_of_counts(pizza_orders)
+    return pizza_counts
+
+
+def get_info_for_drink_orders():
+    drink_counts = create_dict_of_counts(drink_orders)
+    return drink_counts
+
+
+def get_info_for_dessert_orders():
+    dessert_counts = create_dict_of_counts(dessert_orders)
+    return dessert_counts
+
+
+def delete_from_pizza_orders(value_to_delete):
+    for i in range(0, len(pizza_orders)):
+        if pizza_orders[i] == value_to_delete:
+            pizza_orders.remove(pizza_orders[i])
+
+
+def delete_from_drink_orders(value_to_delete):
+    for i in range(0, len(drink_orders)):
+        if drink_orders[i] == value_to_delete:
+            drink_orders.remove(drink_orders[i])
+
+
+def delete_from_dessert_orders(value_to_delete):
+    for i in range(0, len(dessert_orders)):
+        if dessert_orders[i] == value_to_delete:
+            dessert_orders.remove(dessert_orders[i])
+
+
+def create_pizza_order(order_id, pizza_id, size, amount):
+    response = requests.post(BASE_URL + "/pizzaorder/create", data={"order_id": order_id, "pizza_id": pizza_id, "size": size, "amount": amount})
+
+
+def create_drink_order(order_id, drink_id, amount):
+    response = requests.post(BASE_URL + "/drinkorder/create", data={"order_id": order_id, "drink_id": drink_id, "amount": amount})
+
+
+def create_dessert_order(order_id, dessert_id, amount):
+    response = requests.post(BASE_URL + "/dessertorder/create", data={"order_id": order_id, "dessert_id": dessert_id, "amount": amount})
+
+
+def check_pizza_size(pizza_string: str):
+    if "Small" in pizza_string:
+        return "Small"
+    if "Medium" in pizza_string:
+        return "Medium"
+    if "Large" in pizza_string:
+        return "Large"
+
+
+def create_order_for_pizzas(pizza_counts):
+    for i in range(0, len(pizza_orders)):
+        for j in range(1, len(pizzas) + 1):
+            if get_pizza(str(j)) in pizza_orders[i]:
+                pizza_id = j
+                size = check_pizza_size(pizza_orders[i])
+                amount = pizza_counts.get(pizza_orders[i])
+                delete_from_pizza_orders(pizza_orders[i])
+                create_pizza_order(order_id, pizza_id, size, amount)
+
+
+def create_order_for_drinks(drink_counts):
+    for i in range(0, len(drink_orders)):
+        for j in range(1, len(drinks) + 1):
+            if get_drink(str(j)) in drink_orders[i]:
+                drink_id = j
+                amount = drink_counts.get(drink_orders[i])
+                delete_from_drink_orders(drink_orders[i])
+                create_drink_order(order_id, drink_id, amount)
+
+
+def create_order_for_desserts(dessert_counts):
+    for i in range(0, len(dessert_orders)):
+        for j in range(1, len(desserts) + 1):
+            if get_dessert(str(j)) in dessert_orders[i]:
+                dessert_id = j
+                amount = dessert_counts.get(dessert_orders[i])
+                delete_from_dessert_orders(dessert_orders[i])
+                create_dessert_order(order_id, dessert_id, amount)
+
+
 if __name__ == "__main__":
-    # login_information = prompt(home)
-    # information_selected = login_information["home"]
-    # if information_selected == "Log in":
-    #     login_answers = prompt(login_questions)
-    #     verify_login(**login_answers)
-    # if information_selected == "Sign up":
-    #     sign_up_answers = prompt(sign_up_questions)
-    #     verify_sign_up(**sign_up_answers)
-    # if information_selected == "Quit":
-    #     sys.exit()
+    login_information = prompt(home)
+    information_selected = login_information["home"]
+    if information_selected == "Log in":
+        login_answers = prompt(login_questions)
+        email_customer = verify_login(**login_answers)
+    if information_selected == "Sign up":
+        sign_up_answers = prompt(sign_up_questions)
+        verify_sign_up(**sign_up_answers)
+    if information_selected == "Quit":
+        sys.exit()
 
     while True:
         answers = prompt(start_menu)
@@ -366,28 +513,34 @@ if __name__ == "__main__":
                     break
                 check_kind_of_order(kind_selected)
 
-        if answer == "See your previous orders":
-            while True:
-                emails = prompt(validateEmailForOrders)
-                orders = prompt(viewUserOrders)
-                order_selected = orders["orders"]
-                if order_selected == "Go back":
-                    break
-                #check_for_order_type(order_selected)
-                #break
+        # if answer == "See your previous orders":
+        #     while True:
+        #         emails = prompt(validateEmailForOrders)
+        #         orders = prompt(viewUserOrders)
+        #         order_selected = orders["orders"]
+        #         if order_selected == "Go back":
+        #             break
 
         if answer == "Place your order":
             while True:
                 order_placed = prompt(place_order)
                 order_placed_selected = order_placed["place_order"]
                 if order_placed_selected == "Yes":
-                    #TODO: Order place logic
-                    value = 1
+                    customer_id = get_info_for_order_customer(email_customer)
+                    delivery_person_id = get_info_for_order_city(email_customer)
+                    time_of_order = datetime.now()
+                    order_id = create_order(customer_id, time_of_order, delivery_person_id)
+                    pizza_counts = get_info_for_pizza_orders()
+                    create_order_for_pizzas(pizza_counts)
+                    drink_counts = get_info_for_drink_orders()
+                    create_order_for_drinks(drink_counts)
+                    dessert_counts = get_info_for_dessert_orders()
+                    create_order_for_desserts(dessert_counts)
+                    print("-----> YOUR ORDER HAS BEEN PLACED")
+                    #TODO: Display price and the delivery_person and the time at which the pizza will arrive.
+                    sys.exit()
                 else:
                     break
-
-
-
         if answer == "Quit":
             break
 
