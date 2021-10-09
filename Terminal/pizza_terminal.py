@@ -413,7 +413,7 @@ def get_info_for_dessert_orders():
 
 
 def delete_from_pizza_orders(value_to_delete):
-    for i in range(0, len(pizza_orders)):
+    for i in range(0, len(pizza_orders) + ):
         if pizza_orders[i] == value_to_delete:
             pizza_orders.remove(pizza_orders[i])
 
@@ -451,8 +451,20 @@ def check_pizza_size(pizza_string: str):
         return "Large"
 
 
+def count_distinct_pizza_values():
+    return list(set(pizza_orders))
+
+
+def count_distinct_drink_values():
+    return list(set(drink_orders))
+
+
+def count_distinct_dessert_values():
+    return list(set(dessert_orders))
+
+
 def create_order_for_pizzas(pizza_counts):
-    for i in range(0, len(pizza_orders)):
+    for i in range(0, len(count_distinct_pizza_values())):
         for j in range(1, len(pizzas) + 1):
             if get_pizza(str(j)) in pizza_orders[i]:
                 pizza_id = j
@@ -463,7 +475,7 @@ def create_order_for_pizzas(pizza_counts):
 
 
 def create_order_for_drinks(drink_counts):
-    for i in range(0, len(drink_orders)):
+    for i in range(0, len(count_distinct_drink_values())):
         for j in range(1, len(drinks) + 1):
             if get_drink(str(j)) in drink_orders[i]:
                 drink_id = j
@@ -473,7 +485,7 @@ def create_order_for_drinks(drink_counts):
 
 
 def create_order_for_desserts(dessert_counts):
-    for i in range(0, len(dessert_orders)):
+    for i in range(0, len(count_distinct_dessert_values())):
         for j in range(1, len(desserts) + 1):
             if get_dessert(str(j)) in dessert_orders[i]:
                 dessert_id = j
