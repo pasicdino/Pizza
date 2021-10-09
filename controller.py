@@ -1,6 +1,8 @@
 import os
 import random
 import hashlib
+import string
+from datetime import datetime, timedelta
 
 from Model.pizza_sql_model import Customers
 
@@ -82,3 +84,21 @@ def set_every_item_to_string(initial_string: str, dict_to_attach):
     for value in iterable_dict:
         string = string + str(value)
     return string
+
+
+def check_time(latest_update):
+    last_update = datetime.strptime(latest_update, '%a, %d %b %Y %H:%M:%S %Z')
+    last_update_plus_5 = last_update + timedelta(minutes=5)
+    last_update_plus_30 = last_update + timedelta(minutes=30)
+    current_time = datetime.now()
+    if (current_time < last_update_plus_5) | (current_time > last_update_plus_30):
+        return "True"
+    else:
+        return "False"
+
+
+def create_random_string():
+    length = 8
+    letters_and_digits = string.ascii_letters + string.digits
+    result_str = ''.join((random.choice(letters_and_digits) for i in range(length)))
+    return result_str

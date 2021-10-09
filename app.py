@@ -8,10 +8,13 @@ from Model.pizza_sql_model import find_single_pizza, find_number_of_pizzas, find
     find_single_dessert, find_single_customer, create_new_customer, find_city, find_price_of_pizza, \
     find_toppings_of_pizza, find_pizza_vegetarian, find_number_of_drinks, find_number_of_desserts, \
     find_price_of_pizza_by_name, find_delivery_person, create_new_order, update_order_price, find_latest_order, \
-    create_new_pizza_order, create_new_drink_order, create_new_dessert_order
-from controller import password_complexity, check_password, hash_password
+    create_new_pizza_order, create_new_drink_order, create_new_dessert_order, find_delivery_person_by_order_id, \
+    find_order_time, delete_the_order, update_delivery_person_order_time, find_number_of_pizzas_of_customer, \
+    create_new_discount_code, check_discount_code, update_number_of_customers
+from controller import password_complexity, check_password, hash_password, check_time, create_random_string
 
 INVALID_MESSAGE = "email or password is not valid"
+
 
 @app.route("/pizzaprice/<pizza_id>")
 def get_price(pizza_id: int):
@@ -133,10 +136,29 @@ def get_customer_by_email(email):
 @app.route("/deliveryperson/<city>")
 def get_delivery_person_by_city(city):
     delivery_person = find_delivery_person(city=city)
-    if delivery_person:
-        return make_response({"delivery_person_id": delivery_person.delivery_person_id}, 200)
+    for i in range(0, len(delivery_person)):
+        if delivery_person[i].latest_order is not None:
+            result = check_time(delivery_person[i].latest_order)
+            if result == "True":
+                delivery_person_result = delivery_person[i]
+                break
+        else:
+            delivery_person_result = delivery_person[i]
+    if delivery_person_result:
+        return make_response({"delivery_person_id": delivery_person_result.delivery_person_id}, 200)
     else:
+        print("No available delivery person in your neighborhood has been found. Please try again later.")
         return make_response({"error": f"Delivery person with delivery_person_id {delivery_person} does not exist"})
+
+
+@app.route("/deliverypersonname/<order_id>")
+def get_delivery_person_by_order_id(order_id):
+    delivery_person = find_delivery_person_by_order_id(order_id=order_id)
+    if delivery_person:
+        return make_response({"first_name": delivery_person.first_name, "last_name": delivery_person.last_name}, 200)
+    else:
+        return make_response({"error": f"Delivery person with delivery_person_id {delivery_person.delivery_person_id} does not exist"})
+
 
 @app.route("/city/<email>")
 def get_city(email):
@@ -169,6 +191,17 @@ def check_customer():
         return make_response({"result": "Login successful", "response": "success"}, 200)
     else:
         return make_response({"error": INVALID_MESSAGE, "response": "failure"}, 400)
+
+
+
+@app.route("/discount", methods=["POST"])
+def check_discount():
+    discount_code = request.form.get('discount_code')
+
+    if check_discount_code(discount_code):
+        return make_response({"response": "success"}, 200)
+    else:
+        return make_response({"response": "failure"}, 400)
 
 
 @app.route("/signup", methods=["POST"])
@@ -271,5 +304,78 @@ def create_dessert_order():
     except Exception as ex:
         print(f"Could not create a dessert_order with order_id {order_id}")
         return make_response({"error": f"Could not create a dessert_order with order_id {order_id}"}, 400)
+
+    return make_response({"result": "success"}, 200)
+
+
+@app.route("/discount/create", methods=["POST"])
+def create_code_for_discount():
+    customer_id = request.form.get('customer_id')
+    discount_code = create_random_string()
+
+    try:
+        code = create_new_discount_code(customer_id=customer_id, discount_code=discount_code)
+    except Exception as ex:
+        print(f"Could not create a discount code")
+        return make_response({"error": f"Could not create a discount code"}, 400)
+
+    return make_response({"result": "success", "discount_code": code.discount_code}, 200)
+
+@app.route("/ordertime/<order_id>")
+def get_time_of_order(order_id):
+    order = find_order_time(order_id=order_id)
+
+    if order:
+        return make_response({"order_time": order.order_time, "response": "success"}, 200)
+    else:
+        return make_response({"error": f"Order with order_id {order_id} does not exist", "response": "failure"}, 400)
+
+
+@app.route("/order/delete", methods=["POST"])
+def delete_order():
+    order_id = request.form.get('order_id')
+
+    try:
+        delete_the_order(order_id=order_id)
+    except Exception as ex:
+        print(f"Could not delete the order with order_id {order_id}")
+        return make_response({"error": f"Could not delete the order with order_id {order_id}"}, 400)
+
+    print(f"Order with order_id {order_id} has been deleted")
+    return make_response({"result": "success"}, 200)
+
+
+@app.route("/deliveryperson/update", methods=["POST"])
+def update_delivery_person():
+    order_time = request.form.get('order_time')
+    order_id = request.form.get('order_id')
+
+    try:
+        update_delivery_person_order_time(latest_update=order_time, order_id=order_id)
+    except Exception as ex:
+        return make_response({"error": f"Could not update the order at {order_time}"}, 400)
+
+    return make_response({"result": "success"}, 200)
+
+
+@app.route("/customerpizzas/<customer_id>")
+def get_number_of_pizzas_for_customer(customer_id):
+    number = find_number_of_pizzas_of_customer(customer_id=customer_id)
+
+    if number:
+        return make_response({"number": number.number_of_pizzas, "response": "success"}, 200)
+    else:
+        return make_response({"error": "No pizza has been ordered", "response": "failure"}, 400)
+
+
+@app.route("/customerpizzas/update", methods=["POST"])
+def update_number_of_pizzas():
+    number = request.form.get('number')
+    customer_id = request.form.get('customer_id')
+
+    try:
+        update_number_of_customers(number=number, customer_id=customer_id)
+    except Exception as ex:
+        return make_response({"error": f"Could not update the customer with {customer_id}"}, 400)
 
     return make_response({"result": "success"}, 200)
