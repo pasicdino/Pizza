@@ -194,9 +194,9 @@ def create_customer():
         create_new_customer(first_name=first_name, last_name=last_name, email=email, hashed_password=hash_password(password), phone_number=phone_number, street_name=street_name, street_number=street_number, city=city)
     except Exception as ex:
         print(f"Could not create customer with email: {email}")
-        return make_response({"error": f"Could not create customer with email: {email}"}, 400)
+        return make_response({"error": f"Could not create customer with email: {email}", "response": "failure"}, 400)
 
-    return make_response({"result": "success"}, 200)
+    return make_response({"result": "success", "response": "success"}, 200)
 
 
 @app.route("/order/create", methods=["POST"])

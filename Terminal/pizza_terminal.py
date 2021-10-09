@@ -180,8 +180,13 @@ def verify_login(email, password):
 
 def verify_sign_up(email, password, first_name, last_name, phone_number, street_name, street_number, city):
     response = requests.post(BASE_URL + "/signup", data={"email": email, "password": password, "first_name": first_name, "last_name": last_name, "phone number": phone_number, "street_name": street_name, "street_number": street_number, "city": city})
-    email_customer = email
-    city_customer = city
+    result = json.loads(response.text)
+    if result["response"] == "success":
+        print("-----> SIGN UP WAS SUCCESSFUL")
+        return email
+    else:
+        print("-----> SIGN UP WAS NOT SUCCESSFUL")
+        return sys.exit()
 
 
 def get_city_by_email(email):
@@ -412,24 +417,6 @@ def get_info_for_dessert_orders():
     return dessert_counts
 
 
-def delete_from_pizza_orders(value_to_delete):
-    for i in range(0, len(pizza_orders) + ):
-        if pizza_orders[i] == value_to_delete:
-            pizza_orders.remove(pizza_orders[i])
-
-
-def delete_from_drink_orders(value_to_delete):
-    for i in range(0, len(drink_orders)):
-        if drink_orders[i] == value_to_delete:
-            drink_orders.remove(drink_orders[i])
-
-
-def delete_from_dessert_orders(value_to_delete):
-    for i in range(0, len(dessert_orders)):
-        if dessert_orders[i] == value_to_delete:
-            dessert_orders.remove(dessert_orders[i])
-
-
 def create_pizza_order(order_id, pizza_id, size, amount):
     response = requests.post(BASE_URL + "/pizzaorder/create", data={"order_id": order_id, "pizza_id": pizza_id, "size": size, "amount": amount})
 
@@ -451,46 +438,43 @@ def check_pizza_size(pizza_string: str):
         return "Large"
 
 
-def count_distinct_pizza_values():
+def distinct_pizza_values():
     return list(set(pizza_orders))
 
 
-def count_distinct_drink_values():
+def distinct_drink_values():
     return list(set(drink_orders))
 
 
-def count_distinct_dessert_values():
+def distinct_dessert_values():
     return list(set(dessert_orders))
 
 
-def create_order_for_pizzas(pizza_counts):
-    for i in range(0, len(count_distinct_pizza_values())):
+def create_order_for_pizzas(pizza_counts, order_id):
+    for i in range(0, len(distinct_pizza_values())):
         for j in range(1, len(pizzas) + 1):
             if get_pizza(str(j)) in pizza_orders[i]:
                 pizza_id = j
-                size = check_pizza_size(pizza_orders[i])
-                amount = pizza_counts.get(pizza_orders[i])
-                delete_from_pizza_orders(pizza_orders[i])
+                size = check_pizza_size(distinct_pizza_values()[i])
+                amount = pizza_counts.get(distinct_pizza_values()[i])
                 create_pizza_order(order_id, pizza_id, size, amount)
 
 
-def create_order_for_drinks(drink_counts):
-    for i in range(0, len(count_distinct_drink_values())):
+def create_order_for_drinks(drink_counts, order_id):
+    for i in range(0, len(distinct_drink_values())):
         for j in range(1, len(drinks) + 1):
             if get_drink(str(j)) in drink_orders[i]:
                 drink_id = j
-                amount = drink_counts.get(drink_orders[i])
-                delete_from_drink_orders(drink_orders[i])
+                amount = drink_counts.get(distinct_drink_values()[i])
                 create_drink_order(order_id, drink_id, amount)
 
 
-def create_order_for_desserts(dessert_counts):
-    for i in range(0, len(count_distinct_dessert_values())):
+def create_order_for_desserts(dessert_counts, order_id):
+    for i in range(0, len(distinct_dessert_values())):
         for j in range(1, len(desserts) + 1):
             if get_dessert(str(j)) in dessert_orders[i]:
                 dessert_id = j
-                amount = dessert_counts.get(dessert_orders[i])
-                delete_from_dessert_orders(dessert_orders[i])
+                amount = dessert_counts.get(distinct_dessert_values()[i])
                 create_dessert_order(order_id, dessert_id, amount)
 
 
@@ -502,7 +486,7 @@ if __name__ == "__main__":
         email_customer = verify_login(**login_answers)
     if information_selected == "Sign up":
         sign_up_answers = prompt(sign_up_questions)
-        verify_sign_up(**sign_up_answers)
+        email_customer = verify_sign_up(**sign_up_answers)
     if information_selected == "Quit":
         sys.exit()
 
@@ -543,11 +527,11 @@ if __name__ == "__main__":
                     time_of_order = datetime.now()
                     order_id = create_order(customer_id, time_of_order, delivery_person_id)
                     pizza_counts = get_info_for_pizza_orders()
-                    create_order_for_pizzas(pizza_counts)
+                    create_order_for_pizzas(pizza_counts, order_id)
                     drink_counts = get_info_for_drink_orders()
-                    create_order_for_drinks(drink_counts)
+                    create_order_for_drinks(drink_counts, order_id)
                     dessert_counts = get_info_for_dessert_orders()
-                    create_order_for_desserts(dessert_counts)
+                    create_order_for_desserts(dessert_counts, order_id)
                     print("-----> YOUR ORDER HAS BEEN PLACED")
                     #TODO: Display price and the delivery_person and the time at which the pizza will arrive.
                     sys.exit()
