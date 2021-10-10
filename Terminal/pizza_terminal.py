@@ -221,10 +221,15 @@ def verify_sign_up(email, password, first_name, last_name, phone_number, street_
         return sys.exit()
 
 
+def remove_discount_code(discount_code):
+    response = requests.post(BASE_URL + "/discount/delete", data={"discount_code": discount_code})
+
+
 def verify_discount_code(discount_code):
     response = requests.post(BASE_URL + "/discount", data={"discount_code": discount_code})
     result = json.loads(response.text)
     if result["response"] == "success":
+        remove_discount_code(discount_code)
         return "True"
     else:
         return "False"
@@ -240,8 +245,12 @@ def get_city_by_email(email):
 def get_delivery_person_by_city(city):
     response = requests.get(BASE_URL + "/deliveryperson/" + city)
     result = json.loads(response.text)
-    result_delivery_person = result["delivery_person_id"]
-    return result_delivery_person
+    if result["response"] == "failure":
+        print("No available delivery person in your neighborhood has been found. Please try again later.")
+        sys.exit()
+    else:
+        result_delivery_person = result["delivery_person_id"]
+        return result_delivery_person
 
 
 def get_pizza_price(pizza_name):
@@ -277,11 +286,9 @@ start_menu = {
     "type": "list",
     "name": "start",
     "message": "Welcome to the FANCY Back to the Pizza in Hill Valley. What would you like to do?",
-    "choices": ["See the menu", "See your current order", "See your delivery time for latest order", "Place your order", "Quit"],
+    "choices": ["See the menu", "See your current order", "Place your order", "Quit"],
 }
 
-
-# TODO: Display toppings and whether it is vegetarian.
 menu = {
     "type": "list",
     "name": "menu",
@@ -608,12 +615,17 @@ def check_order_selected(order_information_selected, order_id):
             print(f"Your estimated delivery time: {order_time_plus_15}")
 
     if order_information_selected == "Cancel order":
-        order_time_plus_5 = datetime.strptime(get_order_time(order_id), '%a, %d %b %Y %H:%M:%S %Z') + timedelta(minutes=5)
-        time_now = datetime.now()
-        if time_now < order_time_plus_5:
-            remove_order()
+        if get_order_time_check_for_cancel(order_id) == "True":
+            print("-----> Your order is cancelled")
+            update_number_of_pizzas(check_number_of_pizzas_for_customer(str(customer_id)) - len(pizza_orders), customer_id)
         else:
-            print("-----> Sorry this order cannot be canceled since it is already out for delivery")
+            order_time_plus_5 = datetime.strptime(get_order_time(order_id), '%a, %d %b %Y %H:%M:%S %Z') + timedelta(minutes=5)
+            time_now = datetime.now()
+            if time_now < order_time_plus_5:
+                remove_order()
+                print("-----> Your order has been cancelled")
+            else:
+                print("-----> Sorry this order cannot be canceled since it is already out for delivery")
 
 
 if __name__ == "__main__":
@@ -659,10 +671,14 @@ if __name__ == "__main__":
                         discount_selected = discount_check["got_discount"]
                         discount = 0
                         if discount_selected == "Yes":
-                            discount_code_check = prompt(input_discount)
-                            if verify_discount_code(**discount_code_check) == "True":
-                                discount = 0.10
-                                print("-----> DISCOUNT CODE HAS BEEN ADDED")
+                            while True:
+                                discount_code_check = prompt(input_discount)
+                                if verify_discount_code(**discount_code_check) == "True":
+                                    discount = 0.10
+                                    print("-----> DISCOUNT CODE HAS BEEN ADDED")
+                                    break;
+                                else:
+                                    print("-----> DISCOUNT CODE HAS NOT BEEN ADDED. PLEASE TRY AGAIN")
                         customer_id = get_info_for_order_customer(email_customer)
                         delivery_person_id = get_info_for_order_city(email_customer)
                         time_of_order = datetime.now()
@@ -686,9 +702,6 @@ if __name__ == "__main__":
                         if check_number_of_pizzas_for_customer(str(customer_id)) > 9:
                             code = create_discount_code(customer_id)
                             print(f"-----> THANK YOU FOR BEING A CUSTOMER. FOR 10% OFF ON YOUR NEXT ORDER, USE THIS DISCOUNT CODE: {code}")
-
-
-                        #TODO: Check number of pizzas ordered and create and send discount code.
                         while True:
                             order_information = prompt(order_choices)
                             order_information_selected = order_information["order_choices"]
@@ -700,6 +713,7 @@ if __name__ == "__main__":
                         break
                 else:
                     break
+
         if answer == "Quit":
             break
 

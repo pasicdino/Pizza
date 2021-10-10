@@ -10,7 +10,7 @@ from Model.pizza_sql_model import find_single_pizza, find_number_of_pizzas, find
     find_price_of_pizza_by_name, find_delivery_person, create_new_order, update_order_price, find_latest_order, \
     create_new_pizza_order, create_new_drink_order, create_new_dessert_order, find_delivery_person_by_order_id, \
     find_order_time, delete_the_order, update_delivery_person_order_time, find_number_of_pizzas_of_customer, \
-    create_new_discount_code, check_discount_code, update_number_of_customers
+    create_new_discount_code, check_discount_code, update_number_of_customers, delete_discount_code
 from controller import password_complexity, check_password, hash_password, check_time, create_random_string
 
 INVALID_MESSAGE = "email or password is not valid"
@@ -145,10 +145,9 @@ def get_delivery_person_by_city(city):
         else:
             delivery_person_result = delivery_person[i]
     if delivery_person_result:
-        return make_response({"delivery_person_id": delivery_person_result.delivery_person_id}, 200)
+        return make_response({"delivery_person_id": delivery_person_result.delivery_person_id, "response": "success"}, 200)
     else:
-        print("No available delivery person in your neighborhood has been found. Please try again later.")
-        return make_response({"error": f"Delivery person with delivery_person_id {delivery_person} does not exist"})
+        return make_response({"error": f"Delivery person with delivery_person_id {delivery_person} does not exist", "response": "failure"}, 400)
 
 
 @app.route("/deliverypersonname/<order_id>")
@@ -198,7 +197,7 @@ def check_customer():
 def check_discount():
     discount_code = request.form.get('discount_code')
 
-    if check_discount_code(discount_code):
+    if check_discount_code(discount_code=discount_code):
         return make_response({"response": "success"}, 200)
     else:
         return make_response({"response": "failure"}, 400)
@@ -224,7 +223,7 @@ def create_customer():
         print(f"Password does not meet complexity: {message}")
         return make_response({"error": "Password does not meet complexity", "failed": message}, 400)
     try:
-        create_new_customer(first_name=first_name, last_name=last_name, email=email, hashed_password=hash_password(password), phone_number=phone_number, street_name=street_name, street_number=street_number, city=city)
+        create_new_customer(first_name=first_name, last_name=last_name, email=email, hashed_password=hash_password(password), phone_number=phone_number, street_name=street_name, street_number=street_number, city=city, number_of_pizzas=0)
     except Exception as ex:
         print(f"Could not create customer with email: {email}")
         return make_response({"error": f"Could not create customer with email: {email}", "response": "failure"}, 400)
@@ -351,7 +350,7 @@ def update_delivery_person():
     order_id = request.form.get('order_id')
 
     try:
-        update_delivery_person_order_time(latest_update=order_time, order_id=order_id)
+        update_delivery_person_order_time(latest_order=order_time, order_id=order_id)
     except Exception as ex:
         return make_response({"error": f"Could not update the order at {order_time}"}, 400)
 
@@ -377,5 +376,17 @@ def update_number_of_pizzas():
         update_number_of_customers(number=number, customer_id=customer_id)
     except Exception as ex:
         return make_response({"error": f"Could not update the customer with {customer_id}"}, 400)
+
+    return make_response({"result": "success"}, 200)
+
+
+@app.route("/discount/delete", methods=["POST"])
+def delete_discount():
+    discount_code = request.form.get('discount_code')
+
+    try:
+        delete_discount_code(discount_code=discount_code)
+    except Exception as ex:
+        return make_response({"error": f"Could not delete discount_code {discount_code}"}, 400)
 
     return make_response({"result": "success"}, 200)

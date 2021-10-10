@@ -87,9 +87,9 @@ def set_every_item_to_string(initial_string: str, dict_to_attach):
 
 
 def check_time(latest_update):
-    last_update = datetime.strptime(latest_update, '%a, %d %b %Y %H:%M:%S %Z')
-    last_update_plus_5 = last_update + timedelta(minutes=5)
-    last_update_plus_30 = last_update + timedelta(minutes=30)
+    #last_update = datetime.strptime(latest_update, '%a, %d %b %Y %H:%M:%S %Z')
+    last_update_plus_5 = latest_update + timedelta(minutes=5)
+    last_update_plus_30 = latest_update + timedelta(minutes=30)
     current_time = datetime.now()
     if (current_time < last_update_plus_5) | (current_time > last_update_plus_30):
         return "True"

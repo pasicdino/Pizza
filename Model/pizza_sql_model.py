@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from app import app
 from flask_sqlalchemy import SQLAlchemy
@@ -228,7 +229,7 @@ def initialize_database():
     #                                city='Landgraaf'))
     # db.session.commit()
 
-    print(find_delivery_person("Heerlen")[1].latest_order)
+    print(delete_discount_code(discount_code="RKMKK0an"))
 
 
 def find_single_pizza(**kwargs):
@@ -388,13 +389,15 @@ def delete_the_order(order_id):
     db.session.commit()
 
 
-def update_delivery_person_order_time(latest_update, order_id):
-    db.session.query(DeliveryPersons).filter_by(order_id).update(dict(latest_update=latest_update))
+def update_delivery_person_order_time(latest_order, order_id):
+    result = db.session.query(DeliveryPersons).join(Orders, Orders.delivery_person_id == DeliveryPersons.delivery_person_id).filter(Orders.order_id == order_id).first()
+    result.latest_order = latest_order
     db.session.commit()
 
 
-def check_discount_code(discount_code):
-    db.session.query(DiscountCodes).filter_by(discount_code)
+def check_discount_code(**kwargs):
+    result = db.session.query(DiscountCodes).filter_by(**kwargs).first()
+    return result
 
 
 def find_number_of_pizzas_of_customer(customer_id):
@@ -410,7 +413,13 @@ def create_new_discount_code(**kwargs):
 
 
 def update_number_of_customers(number, customer_id):
-    db.session.query(Customers).filter_by(customer_id).update(dict(number_of_pizzas=number))
+    result = db.session.query(Customers).filter_by(customer_id=customer_id).first()
+    result.number_of_pizzas = number
+    db.session.commit()
+
+
+def delete_discount_code(discount_code):
+    db.session.query(DiscountCodes).filter_by(discount_code=discount_code).delete()
     db.session.commit()
 
 
