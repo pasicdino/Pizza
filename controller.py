@@ -6,48 +6,36 @@ from datetime import datetime, timedelta
 
 from Model.pizza_sql_model import Customers
 
-pepper_letters = ["a", "b", "c", "z"]
+pepper_letters = ["a", "b", "c", "d", "e", "f"]
 
 
 def hash_password(password: str):
-    # Ask the operating system for 32 random bytes
     salt = os.urandom(32)
 
-    # Select a random letter and position to insert as pepper
-    pep_loc = random.randint(0, len(password))
-    pep_char = random.choice(pepper_letters)
-    password = password[:pep_loc] + pep_char + password[pep_loc:]
+    pepper_loc = random.randint(0, len(password))
+    pepper_char = random.choice(pepper_letters)
+    password = password[:pepper_loc] + pepper_char + password[pepper_loc:]
 
-    print(f"Peppered password: {password}")
-
-    # Create a 64 byte key
     key = hashlib.pbkdf2_hmac(
-        "sha256",  # The hash digest algorithm for HMAC
-        password.encode("utf-8"),  # Convert the password to bytes
-        salt,  # Provide the salt
-        100000,  # It is recommended to use at least 100,000 iterations of SHA-256
+        "sha256",
+        password.encode("utf-8"),
+        salt,
+        100000,
     )
 
-    # For an extra obfuscated step, concatenate the salt and the hash
-    # An attacker would need to know the length of the salt and key to decrypt
-    # Storage is of type bytes
     return salt + key
 
 
 def check_password(the_customer: Customers, password: str):
-    # Getting the values back out
-    salt = the_customer.hashed_password[:32]  # 32 is the length of the salt
+    salt = the_customer.hashed_password[:32]
     key = the_customer.hashed_password[32:]
     for pepper_letter in pepper_letters:
-        for pep_loc in range(len(password)):
-            pepper_password = password[:pep_loc] + pepper_letter + password[pep_loc:]
-            print(f"Trying pepper: {pepper_password}")
-            # Use the exact same setup you used to generate the key, but this time put in the password to check
+        for pepper_loc in range(len(password)):
+            pepper_password = password[:pepper_loc] + pepper_letter + password[pepper_loc:]
             new_key = hashlib.pbkdf2_hmac(
                 "sha256", pepper_password.encode("utf-8"), salt, 100000
-            )  # Convert the password to bytes
+            )
             if new_key == key:
-                print("Success!")
                 return True
 
     return False

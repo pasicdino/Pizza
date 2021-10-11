@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 from app import app
 from flask_sqlalchemy import SQLAlchemy
@@ -121,6 +120,7 @@ class DrinkOrders(db.Model):
 
 
 def initialize_database():
+    values = True # Placeholder for method
     # db.create_all()
     # db.session.add(Pizzas(pizza_name='Margherita', vegetarian=True))
     # db.session.add(Pizzas(pizza_name='Tonno', vegetarian=True))
@@ -228,8 +228,6 @@ def initialize_database():
     #                                phone_number='0645971348', street_name='Eijkhagenlaan', street_number='31',
     #                                city='Landgraaf'))
     # db.session.commit()
-
-    print(delete_discount_code(discount_code="RKMKK0an"))
 
 
 def find_single_pizza(**kwargs):

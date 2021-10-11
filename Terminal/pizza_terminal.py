@@ -5,7 +5,6 @@ from PyInquirer import prompt, Separator
 import requests
 import json
 
-# from ..controller import set_every_item_to_string
 
 BASE_URL = "http://127.0.0.1:5000"
 
@@ -629,18 +628,16 @@ def check_order_selected(order_information_selected, order_id):
 
 
 if __name__ == "__main__":
-    # login_information = prompt(home)
-    # information_selected = login_information["home"]
-    # if information_selected == "Log in":
-    #     login_answers = prompt(login_questions)
-    #     email_customer = verify_login(**login_answers)
-    # if information_selected == "Sign up":
-    #     sign_up_answers = prompt(sign_up_questions)
-    #     email_customer = verify_sign_up(**sign_up_answers)
-    # if information_selected == "Quit":
-    #     sys.exit()
-
-    email_customer = "laurencenickel00@gmail.com"
+    login_information = prompt(home)
+    information_selected = login_information["home"]
+    if information_selected == "Log in":
+        login_answers = prompt(login_questions)
+        email_customer = verify_login(**login_answers)
+    if information_selected == "Sign up":
+        sign_up_answers = prompt(sign_up_questions)
+        email_customer = verify_sign_up(**sign_up_answers)
+    if information_selected == "Quit":
+        sys.exit()
 
     while True:
         answers = prompt(start_menu)
